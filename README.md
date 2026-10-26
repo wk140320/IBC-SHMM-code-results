@@ -16,7 +16,7 @@ The code expects the official UCI HAPT (dataset 341) and HARTH (dataset 779) arc
 python 01_Official_Real_Datasets/download_datasets.py
 ```
 
-The UCI catalog lists both source datasets under CC BY 4.0: [HAPT, DOI 10.24432/C54G7M](https://archive.ics.uci.edu/dataset/341/smartphone+based+recognition+of+human+activities+and+postural+transitions) and [HARTH, DOI 10.24432/C5NC90](https://archive.ics.uci.edu/dataset/779/harth). Please cite the dataset creators and follow the dataset records' attribution terms. Raw archives remain local and are excluded by `.gitignore`.
+The UCI catalog currently lists both source datasets under CC BY 4.0: [HAPT, DOI 10.24432/C54G7M](https://archive.ics.uci.edu/dataset/341/smartphone+based+recognition+of+human+activities+and+postural+transitions) and [HARTH, DOI 10.24432/C5NC90](https://archive.ics.uci.edu/dataset/779/harth). However, the README included in the retrieved HAPT version 2.1 archive states that commercial use is prohibited. These source statements conflict, and the applicable HAPT terms have not been clarified; this repository does not make a legal determination. Until the data provider or rights holder clarifies the discrepancy, do not infer that the catalog entry alone resolves the terms applicable to the archived HAPT files, especially for commercial use. The HARTH catalog record lists CC BY 4.0. Cite the dataset creators and consult the source records. Raw archives remain local and are excluded by `.gitignore`.
 
 ## Environment
 

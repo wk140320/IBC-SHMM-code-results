@@ -4,7 +4,7 @@ Raw HAPT and HARTH archives are not stored in this repository. Run `python 01_Of
 
 Dataset records and attribution:
 
-- HAPT: Reyes-Ortiz et al. (2015), UCI dataset 341, DOI [10.24432/C54G7M](https://doi.org/10.24432/C54G7M), CC BY 4.0.
+- HAPT: Reyes-Ortiz et al. (2015), UCI dataset 341, DOI [10.24432/C54G7M](https://doi.org/10.24432/C54G7M). The current UCI catalog record lists CC BY 4.0, while the README in the retrieved version 2.1 archive states that commercial use is prohibited. These statements conflict; applicable terms remain unresolved, and this repository makes no legal determination. Consult the provider or rights holder before relying on the archive for uses that depend on the disputed terms.
 - HARTH: Logacjov et al. (2021), UCI dataset 779, DOI [10.24432/C5NC90](https://doi.org/10.24432/C5NC90), CC BY 4.0; related dataset paper, DOI [10.3390/s21237853](https://doi.org/10.3390/s21237853).
 
 See `data_provenance.csv` for the access dates, archive sizes, and expected SHA-256 values used by this experiment package. Dataset terms and attribution are governed by their official records.
