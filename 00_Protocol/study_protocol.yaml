@@ -1,0 +1,115 @@
+protocol_version: "1.0.0-preregistered-2026-10-23"
+preregistration_date: "2026-10-23"
+global_random_seed: 20261015
+locked_before_test_evaluation: true
+
+core_ibc_hyperparameters_frozen:
+  c_clean: 4.2
+  c_burst: 5.5
+  c_iso: 6.5
+  nu_clean: 24.0
+  nu_0: 3.2
+  tau_core: 1.65
+  q_sat: 22.0
+  z_gate: 2.65
+  eta_min: 0.01
+  tau_base: 0.52
+  tau_slope: 0.48
+  eq_weight: 0.16
+
+datasets_and_splits:
+  HAPT_id341:
+    official_url: "https://archive.ics.uci.edu/dataset/341/smartphone+based+recognition+of+human+activities+and+postural+transitions"
+    download_url: "https://archive.ics.uci.edu/static/public/341/smartphone+based+recognition+of+human+activities+and+postural+transitions.zip"
+    doi: "10.24432/C54G7M"
+    license: "CC-BY-4.0"
+    channels_m: 6
+    channel_names: ["acc_x_g", "acc_y_g", "acc_z_g", "gyro_x_rads", "gyro_y_rads", "gyro_z_rads"]
+    sampling_rate_hz: 50
+    subject_split_policy: "strict_subject_disjoint_official_uci_partition_with_val"
+    train_subjects: [1, 3, 5, 6, 7, 8, 11, 14, 15, 16, 17, 19, 21, 22, 23, 25, 26, 27]
+    val_subjects: [28, 29, 30]
+    test_subjects: [2, 4, 9, 10, 12, 13, 18, 20, 24]
+    reset_policy: "pre_obs_equilibrium_at_experiment_id_boundaries"
+    normalization_policy: "train_subject_labeled_channel_mean_std_only"
+    tasks:
+      HAPT_S_primary:
+        description: "6 basic activities (IDs 1..6) as M=6 discrete modes; postural transitions (IDs 7..12) evaluated as directional transition interval/onset events"
+        num_modes_M: 6
+        state_dim_d: 6
+        basic_activity_ids: [1, 2, 3, 4, 5, 6]
+        transition_activity_ids: [7, 8, 9, 10, 11, 12]
+        event_matching:
+          algorithm: "one_to_one_hungarian_bipartite_directional"
+          primary_tolerance_samples: 25
+          sensitivity_tolerance_samples: 50
+      HAPT_12_secondary:
+        description: "All 12 native classes (6 basic + 6 postural transitions) as M=12 modes, calibrated and reported separately"
+        num_modes_M: 12
+        state_dim_d: 6
+
+  HARTH_id779:
+    official_url: "https://archive.ics.uci.edu/dataset/779/harth"
+    download_url: "https://archive.ics.uci.edu/static/public/779/harth.zip"
+    doi: "10.24432/C5NC90"
+    license: "CC-BY-4.0"
+    channels_m: 6
+    channel_names: ["back_x_g", "back_y_g", "back_z_g", "thigh_x_g", "thigh_y_g", "thigh_z_g"]
+    sampling_rate_hz: 50
+    outer_evaluation_policy: "LOSO_22_subjects_paired"
+    inner_validation_policy: "fixed_3_train_subjects_for_hyperparameter_selection"
+    deployment_regimes:
+      regime_A_cross_subject_zero_adaptation: "Fit A_j, b_j, C_j, Q_j, R_j, T and feature scalers strictly on training subjects; zero adaptation on held-out test subject"
+      regime_B_prefix_calibrated: "Use initial 15% of test subject recording for supervised calibration; evaluate strictly on remaining [15%:100%] with equal prefix access for all methods"
+    class_handling_rule: "Evaluate common core dynamic/postural classes and full present classes with zero_division=np.nan for subject-missing classes and explicit per-subject class coverage logging"
+
+comparison_methods:
+  switching_state_space_family:
+    - "IBC-SHMM"
+    - "IBC-SHMM-PrevStep"
+    - "IBC-SHMM-ObsWarmStart"
+    - "IBC-PureMarginal-Ab"
+    - "Standard-SKF-NoEq"
+    - "Standard-SKF"
+    - "Sat-SKF"
+    - "Huber-SKF-SingleLayer"
+    - "StudentT-IMM-1Step-NoEq"
+    - "StudentT-IMM-1Step"
+    - "StudentT-IMM-VB-ELBO"
+    - "Coord-StudentT-IMM-ELBO"
+    - "StudentT-IMM-VB-Cal"
+    - "Coord-StudentT-IMM"
+    - "Hampel-ValTuned+Standard-SKF"
+    - "Hampel31-Fixed6+Standard-SKF"
+    - "Hampel-ValTuned+IBC-SHMM"
+  task_competitors_separate_group:
+    - "Supervised-Gaussian-HMM-Forward"
+    - "Causal-Window-RandomForest"
+    - "Causal-Window-HistGBDT"
+
+r2_semi_synthetic_intervention_protocol:
+  target_slice: "test_subjects_copy_only"
+  rng_seed: 20261023
+  label_independence: true
+  fault_regimes:
+    - id: "R2_SparseSpike_2Ch_8Sigma"
+      description: "Isolated 1-step partial-channel impulse (2 of 6 channels, +/-8 train robust scale, 1.5% step rate)"
+    - id: "R2_Burst4Step_SingleSensor3Ch_8Sigma"
+      description: "4-step consecutive burst on one 3-axis sensor (3 of 6 channels, +/-8 train robust scale, 0.5% burst onset rate)"
+    - id: "R2_StepBiasDrift_20Step_2Ch_4Sigma"
+      description: "20-step sustained bias drift on 2 of 6 channels (+/-4 train robust scale)"
+    - id: "R2_SensorFreeze_10Step_2Ch"
+      description: "10-step sample-and-hold channel freeze on 2 of 6 channels"
+
+statistical_inference_plan:
+  unit_of_analysis: "subject_id"
+  primary_endpoints:
+    - "Endpoint_A: HAPT_S_clean_subject_macro_f1"
+    - "Endpoint_B: HAPT_S_clean_directional_transition_event_f1_tol25"
+    - "Endpoint_C: HARTH_LOSO_clean_subject_macro_f1"
+  tests:
+    - "paired_sign_flip_permutation_test_10000"
+    - "paired_t_test"
+    - "wilcoxon_signed_rank_test"
+    - "subject_cluster_bootstrap_95ci_10000"
+  multiplicity_correction: "Holm-Bonferroni"

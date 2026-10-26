@@ -1,0 +1,26 @@
+# Downloaded third-party datasets (retrieve from UCI; do not commit raw participant data)
+01_Official_Real_Datasets/HAPT/*.zip
+01_Official_Real_Datasets/HAPT/extracted/
+01_Official_Real_Datasets/HARTH/*.zip
+01_Official_Real_Datasets/HARTH/extracted/
+
+# Generated reports may contain subject-level metrics, event records, or local execution metadata
+02_Adapters_and_Evaluation/dataset_adapter_tests.json
+02_Adapters_and_Evaluation/fit_history.jsonl
+02_Adapters_and_Evaluation/tests/online_causality_tests.json
+03_Results/real_clean_results.json
+03_Results/real_injected_results.json
+03_Results/ablation_attribution_results.json
+03_Results/intervention_manifest.json
+03_Results/per_subject_metrics.csv
+03_Results/per_event_matching.csv
+03_Results/runtime_memory_results.csv
+03_Results/recompute_execution_provenance.json
+__pycache__/
+*.py[cod]
+.DS_Store
+.venv/
+
+# Generated audit outputs
+04_Scientific_Audit/online_causality_tests.json
+04_Scientific_Audit/leakage_audit.md

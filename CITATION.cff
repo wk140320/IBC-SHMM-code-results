@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: "If you use this software or the aggregate artifacts, cite the associated IBC-SHMM manuscript; add its final bibliographic record and DOI when available."
+title: "IBC-SHMM: Code and Aggregated Results"
+authors:
+  - family-names: Wu
+    given-names: Kai
+    orcid: "https://orcid.org/0009-0006-8040-6079"
+version: 0.1.0

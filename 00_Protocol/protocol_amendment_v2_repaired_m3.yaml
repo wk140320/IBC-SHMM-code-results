@@ -1,0 +1,69 @@
+# Versioned Protocol Amendment v2.0 (Post-Hoc Diagnostic & Exploratory Revision Log)
+# NOTE: Original preregistered protocol `00_Protocol/study_protocol.yaml` (SHA256: 442f30836d8b3ecac61ba1a5fb9ceb15c18d7b98f4c19de7c3f7a416ae2e2c5b)
+# is preserved 100% read-only and unmodified as the confirmatory lock for `IBC-SHMM-LegacySat`.
+
+protocol_version: "2.0-amendment-exploratory"
+amendment_date: "2026-10-24"
+parent_preregistered_protocol:
+  file: "00_Protocol/study_protocol.yaml"
+  sha256: "442f30836d8b3ecac61ba1a5fb9ceb15c18d7b98f4c19de7c3f7a416ae2e2c5b"
+  locked_algorithm_variant: "IBC-SHMM-LegacySat"
+  epistemic_status: "Confirmatory (Preregistered prior to external test evaluation)"
+  frozen_hyperparameters:
+    c_clean: 4.2
+    c_burst: 5.5
+    c_iso: 6.5
+    nu_clean: 24.0
+    nu_0: 3.2
+    z_gate: 2.65
+    anom_alpha: 0.48
+    tier3_weight: "scalar_high_dof"
+    mode_score_form: "q_sat_clipped (-0.5*ld_dyn - 0.45*rho_sat_dyn - 0.16*rho_sat_eq - 0.02*ld_eq)"
+
+amended_repaired_protocol:
+  algorithm_variant: "IBC-SHMM (Repaired M3)"
+  epistemic_status: "Post-Hoc Diagnostic / Exploratory Algorithmic Revision (Formulated after diagnosing heteroscedastic q_sat static-mode trap on external IMU streams)"
+  repaired_hyperparameters:
+    c_clean: 3.0
+    c_burst: 5.0
+    c_iso: 3.8
+    nu_clean: 24.0
+    nu_0: 4.0
+    z_gate: 3.2
+    anom_alpha: 0.55
+    w_eq: 0.16
+    q_sat: "max(22.0, chi2_{m,0.999})"
+    w_dof_raw: "((nu_0 + m) / (nu_0 + m + u2_excess)) * min(1.0, q_sat / max(u2_full, 1e-12))"
+    tier3_weight: "0.5 * coordinate_student_t + 0.5 * global_student_t"
+    mode_score_form: "unclipped (-0.5*ld_dyn - 0.50*rho_unclip_dyn - 0.08*rho_unclip_eq)"
+
+unconfounded_single_factor_attribution_chain:
+  - step_id: "Step_0"
+    method: "IBC-SHMM-LegacySat"
+    changed_factor: "Baseline (Confirmatory v1.0 frozen parameters & q_sat-clipped mode score)"
+  - step_id: "Step_1a"
+    method: "IBC-Ab1a-UnclipOnly"
+    changed_factor: "Strictly 1 factor vs Step 0: Replace min(u^2, q_sat) with u^2 in mode score; keep (-0.5, -0.45, -0.16, -0.02), legacy thresholds, scalar Tier-3, and M3 w_dof_raw"
+  - step_id: "Step_1b"
+    method: "IBC-Ab1b-UnclipPlusDyn050"
+    changed_factor: "Strictly 1 factor vs Step 1a: Change dynamic Student-t coefficient from -0.45 to -0.50"
+  - step_id: "Step_1c"
+    method: "IBC-Ab1c-UnclipPlusDyn050Eq008"
+    changed_factor: "Strictly 1 factor vs Step 1b: Change equilibrium Student-t coefficient from -0.16 to -0.08 (-0.5*w_eq)"
+  - step_id: "Step_1d"
+    method: "IBC-Ab1-UnclipModeScoreOnly"
+    changed_factor: "Strictly 1 factor vs Step 1c: Remove -0.02*ld_eff_eq term (completing repaired mode-score functional form)"
+  - step_id: "Step_2"
+    method: "IBC-Ab2-UnclipPlusThresholds"
+    changed_factor: "Strictly 1 factor vs Step 1d: Update thresholds (4.2,5.5,6.5,nu0=3.2,z_gate=2.65,alpha=0.48) -> (3.0,5.0,3.8,nu0=4.0,z_gate=3.2,alpha=0.55); keep scalar Tier-3 and M3 w_dof_raw"
+  - step_id: "Step_3"
+    method: "IBC-SHMM"
+    changed_factor: "Strictly 1 factor vs Step 2: Update Tier-3 weight from scalar to 0.5/0.5 coordinate-global hybrid (completing full repaired IBC-SHMM)"
+  - step_id: "Orthogonal_M3_Check"
+    method: "IBC-Ab3-PreM3StateWeight"
+    changed_factor: "Strictly 1 factor vs IBC-SHMM: Omit min(1, q_sat/u2_dyn) factor in w_dof_raw while keeping all repaired thresholds, Tier-3 hybrid weight, and unclipped mode score"
+
+event_matching_and_fairness_amendments:
+  event_matching_tolerance: "Exact continuous-time physical seconds: abs(t_pred_sec - t_true_interval_sec) <= 0.5s (primary) and <= 1.0s (sensitivity), preserving raw 50 Hz event onset/end timestamps"
+  harth_prefix_15pct_fairness: "Both switching state-space filters AND supervised task competitors (Gaussian-HMM, RandomForest, HistGBDT) are adapted using the target subject's 15% prefix; zero-adaptation task competitor scores are also reported alongside for transparency"
+  statistical_sign_flip_test: "True exhaustive 2^N enumeration for all N <= 24 (including 2^21 = 2,097,152 and 2^22 = 4,194,304 on HARTH)"
